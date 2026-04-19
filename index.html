@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Traduzione OBS</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <!-- Barra controlli -->
+  <div id="barra-controlli">
+    <label>Font:</label>
+    <select id="font-selezionato">
+      <option value="Segoe UI, Tahoma, Geneva, Verdana, sans-serif">Segoe UI</option>
+      <option value="Arial, sans-serif" selected>Arial</option>
+      <option value="'Roboto', sans-serif">Roboto</option>
+      <option value="'Times New Roman', serif">Times New Roman</option>
+      <option value="'Courier New', monospace">Courier New</option>
+    </select>
+
+    <button id="grassetto-toggle">G</button>
+
+    <label>Dimensione:</label>
+    <div id="controllo-dimensione">
+      <button id="font-minus" type="button" aria-label="Diminuisci dimensione">−</button>
+      <div id="dimensione-wrapper">
+        <input id="dimensione-font" type="text" value="28" inputmode="numeric" autocomplete="off">
+        <div id="menu-dimensioni" class="nascosto">
+          <button type="button" class="opzione-dimensione">8</button>
+          <button type="button" class="opzione-dimensione">9</button>
+          <button type="button" class="opzione-dimensione">10</button>
+          <button type="button" class="opzione-dimensione">11</button>
+          <button type="button" class="opzione-dimensione">12</button>
+          <button type="button" class="opzione-dimensione">14</button>
+          <button type="button" class="opzione-dimensione">18</button>
+          <button type="button" class="opzione-dimensione">24</button>
+          <button type="button" class="opzione-dimensione">30</button>
+          <button type="button" class="opzione-dimensione">36</button>
+          <button type="button" class="opzione-dimensione">48</button>
+          <button type="button" class="opzione-dimensione">60</button>
+          <button type="button" class="opzione-dimensione">72</button>
+          <button type="button" class="opzione-dimensione">96</button>
+        </div>
+      </div>
+      <button id="font-plus" type="button" aria-label="Aumenta dimensione">+</button>
+    </div>
+
+    <label>Colore:</label>
+    <input type="color" id="colore-font" value="#ffffff">
+
+    <button id="scarica-button">Scarica 📥</button>
+
+<!--
+<label>Lingua:</label>
+<select id="lingua-dettatura">
+  <option value="it-IT" selected>Italiano</option>
+  <option value="en-US">English (US)</option>
+  <option value="en-GB">English (UK)</option>
+  <option value="es-ES">Español</option>
+  <option value="fr-FR">Français</option>
+  <option value="de-DE">Deutsch</option>
+</select>
+
+<button id="dettatura-button">🎤</button>
+-->
+  </div>
+
+  <!-- BLOCCO MEMORIA -->
+  <div id="etichetta"> MEMORIA </div>
+  <div id="blocco-memoria">
+    <div id="memoria-contenuto"></div>
+  </div>
+
+  <!-- Editor -->
+  <div id="etichetta1"> EDITOR TESTO</div>
+  <div id="contenitore-testo">
+    <div id="testo-input" contenteditable="true" spellcheck="false"></div>
+  </div>
+
+  <!-- Viewer verde -->
+  <div id="riquadro-verde">
+    <div id="contenuto-verde"></div>
+  </div>
+
+  <!-- Righe editor -->
+  <div id="controller-righe">
+    <label>Righe editor:</label>
+    <input type="number" id="righe-editor" min="1" max="20" value="2">
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>

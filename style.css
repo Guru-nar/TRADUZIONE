@@ -1,0 +1,272 @@
+* { box-sizing: border-box; }
+
+body, html {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  background-color: #121212;
+  color: #eee;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Barra dei controlli */
+#barra-controlli {
+  background: linear-gradient(135deg, #222831cc, #393e46cc);
+  backdrop-filter: blur(10px);
+  padding: 0.5rem 1rem;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.6rem;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.6);
+  border: 1px solid rgba(255,255,255,0.1);
+  animation: fadein 0.8s forwards ease;
+}
+@keyframes fadein { to { opacity: 1; } }
+
+#etichetta {
+  font-weight: bolder;
+  color: #dfd2d2;
+  margin: 0 auto;
+  padding-top: 10px;
+}
+
+#etichetta1 {
+  font-weight: bolder;
+  color: #dfd2d2;
+  margin: 0 auto;
+  padding-bottom: 10px;
+}
+
+select, input[type="color"], input[type="range"], button {
+  background: #2a2a2a;
+  border: 1px solid #444;
+  border-radius: 8px;
+  color: #eee;
+  padding: 0.35rem 0.75rem;
+  cursor: pointer;
+  font-size: 0.9rem;
+  transition: background 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease, transform 0.1s ease;
+}
+
+button:hover {
+  background: #00bfff;
+  color: #000;
+  box-shadow: 0 0 8px #00bfffaa;
+}
+button:active { transform: scale(0.95); }
+
+#grassetto-toggle.attivo,
+#dettatura-button.attivo {
+  background: #00bfff;
+  color: #000;
+  box-shadow: 0 0 12px #00d0ffdd;
+}
+
+/* BLOCCO MEMORIA */
+#blocco-memoria {
+  width: 72%;
+  max-width: 100%;
+  margin: 10px auto;
+  background: #515050; /* più scuro dell’editor */
+  color: inherit;
+  padding-left: 10px;
+  padding-right: 10px;
+  padding-top: 3px;
+  padding-bottom: 3px;
+  border-radius: 6px;
+  min-height: 170px;
+  max-height: 170px; /* altezza visibile */
+  overflow-y: auto;  /* scroll interno */
+  box-shadow: 0 0 10px #0005;
+}
+
+#memoria-contenuto {
+  white-space: pre-wrap;
+  font-size: 2rem;
+  line-height: 1.3;
+  word-break: break-word;
+}
+
+/* --- Stile righe con pulsante copia nel blocco memoria --- */
+.memoria-riga {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid #444;
+  padding: 4px 0;
+}
+
+.memoria-testo {
+  flex: 1;
+  padding-right: 10px;
+}
+
+.bottone-copia {
+  padding: 4px 10px;
+  background: #2a2a2a;
+  border: 1px solid #555;
+  color: #fff;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.8rem;
+}
+
+.bottone-copia:hover {
+  background: #00bfff;
+  color: #000;
+}
+
+/* editor */
+#contenitore-testo {
+  flex: 1;
+  background: #3b3b2d;
+  padding: 1rem;
+  overflow-y: auto;
+  border-radius: 6px;
+  width: 70%;
+  max-width: 100%; 
+  margin: 0 auto;
+}
+
+#testo-input {
+  display: block;
+  outline: none;
+  border: none;
+  background: transparent;
+  color: inherit;
+  font-size: 2rem;
+  line-height: 1.3;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+/* Riquadro verde (viewer sottotitoli) */
+#riquadro-verde {
+  width: 100%;
+  background: #00b33c;
+  border-top: 3px solid #0a6629;
+
+  margin-top: 5px;
+  margin-bottom: 5px;
+  display: flex;                 /* centra il contenuto dentro il riquadro */
+  justify-content: center;       /* centro orizzontale del blocco testo */
+  align-items: center;           /* centro verticale (se una riga si vede proprio al centro) */
+
+  min-height: calc(2.6rem * 1.3 * 2); /* circa due righe di altezza */
+  padding: 8px 0;               /* spazio sopra/sotto, lati gestiti dal blocco interno */
+}
+
+/* Testo dentro il viewer: barra centrale tipo sottotitoli */
+#contenuto-verde {
+  white-space: pre-wrap;
+  font-size: 2rem;
+  line-height: 1.3;
+
+  max-width: 70%;          /* larghezza massima della "barra" centrale */
+  text-align: center;      /* testo centrato */
+  display: block;
+}
+
+/* Controller righe */
+#controller-righe {
+  width: 100%;
+  padding: 8px;
+  background: #222;
+  color: #fff;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: center;
+}
+
+/* Microfono */
+/* DETTATURA DISABILITATA TEMPORANEAMENTE */
+/*
+#dettatura-button {
+  background: #ff4444;
+  border: 1px solid #aa2222;
+}
+#dettatura-button.attivo {
+  background: #00ff99;
+  color: #000;
+  box-shadow: 0 0 12px #00ff99ee;
+}
+*/
+
+/* --- Controllo dimensione stile Google Docs --- */
+#controllo-dimensione {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  position: relative;
+}
+
+#font-minus,
+#font-plus {
+  min-width: 34px;
+  padding: 0.35rem 0.65rem;
+  font-size: 1.2rem;
+  line-height: 1;
+}
+
+#dimensione-wrapper {
+  position: relative;
+}
+
+#dimensione-font {
+  width: 62px;
+  text-align: center;
+  background: #2a2a2a;
+  border: 1px solid #444;
+  border-radius: 8px;
+  color: #eee;
+  padding: 0.35rem 0.5rem;
+  font-size: 0.95rem;
+  outline: none;
+}
+
+#dimensione-font:focus {
+  border-color: #00bfff;
+  box-shadow: 0 0 8px #00bfff66;
+}
+
+#menu-dimensioni {
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 0;
+  width: 100%;
+  max-height: 260px;
+  overflow-y: auto;
+  background: #2a2a2a;
+  border: 1px solid #444;
+  border-radius: 10px;
+  box-shadow: 0 8px 20px rgba(0,0,0,0.45);
+  z-index: 1000;
+  padding: 4px 0;
+}
+
+#menu-dimensioni.nascosto {
+  display: none;
+}
+
+.opzione-dimensione {
+  display: block;
+  width: 100%;
+  border: none;
+  border-radius: 0;
+  background: transparent;
+  color: #eee;
+  text-align: center;
+  padding: 8px 0;
+  box-shadow: none;
+}
+
+.opzione-dimensione:hover {
+  background: #00bfff;
+  color: #000;
+  box-shadow: none;
+}
