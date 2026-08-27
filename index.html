@@ -1,94 +1,1305 @@
 <!DOCTYPE html>
 <html lang="it">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Traduzione OBS</title>
-  <link rel="stylesheet" href="style.css" />
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Consolle Traduzione — Regia Live</title>
+<style>
+  :root{
+    --bg-void: #0a0c0e;
+    --bg-panel: #14171a;
+    --bg-panel-alt: #1b1f23;
+    --bg-field: #1f2428;
+    --hairline: #272c31;
+    --hairline-forte: #363c42;
+    --testo-primario: #ecece6;
+    --testo-muto: #83898f;
+    --testo-flebile: #565c62;
+    --segnale: #35e0c0;
+    --segnale-scuro: #12433b;
+    --tally-rosso: #ff4438;
+    --tally-rosso-scuro: #3c1613;
+    --tally-verde: #34d976;
+    --tally-ambra: #ffb224;
+    --chroma: #00b140;
+    --chroma-bordo: #067a30;
+    --mono: ui-monospace, "SFMono-Regular", "Cascadia Mono", Consolas, "Liberation Mono", Menlo, monospace;
+    --sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  }
+
+  * { box-sizing: border-box; }
+
+  html, body {
+    margin: 0;
+    padding: 0;
+    min-height: 100%;
+    background: var(--bg-void);
+    color: var(--testo-primario);
+    font-family: var(--sans);
+  }
+
+  body {
+    background-image:
+      radial-gradient(circle at 15% -10%, #14231f55, transparent 40%),
+      radial-gradient(circle at 100% 0%, #12212a55, transparent 45%);
+  }
+
+  ::selection { background: var(--segnale); color: #04201b; }
+
+  .etichetta-tecnica {
+    font-family: var(--mono);
+    font-size: 0.68rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--testo-muto);
+  }
+
+  /* ================= TESTATA ================= */
+  .testata {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 0.85rem 1.4rem;
+    background: linear-gradient(180deg, var(--bg-panel-alt), var(--bg-panel));
+    border-bottom: 1px solid var(--hairline);
+  }
+
+  .testata-sinistra { display: flex; align-items: center; gap: 0.75rem; }
+
+  .marchio {
+    display: flex;
+    align-items: baseline;
+    gap: 0.5rem;
+  }
+  .marchio-sigla {
+    font-family: var(--mono);
+    font-weight: 700;
+    font-size: 1.05rem;
+    letter-spacing: 0.02em;
+  }
+  .marchio-sigla span { color: var(--segnale); }
+  .marchio-sottotitolo {
+    font-family: var(--mono);
+    font-size: 0.68rem;
+    color: var(--testo-flebile);
+    letter-spacing: 0.08em;
+  }
+
+  .spia-connessione {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.3rem 0.7rem;
+    border: 1px solid var(--hairline-forte);
+    border-radius: 999px;
+    background: var(--bg-field);
+    font-family: var(--mono);
+    font-size: 0.72rem;
+    color: var(--testo-muto);
+  }
+  .puntino {
+    width: 8px; height: 8px; border-radius: 50%;
+    background: var(--testo-flebile);
+    box-shadow: none;
+    transition: background 0.25s ease, box-shadow 0.25s ease;
+  }
+  .puntino.attivo {
+    background: var(--tally-verde);
+    box-shadow: 0 0 8px var(--tally-verde);
+  }
+
+  /* ================= LAYOUT PRINCIPALE ================= */
+  .corpo {
+    display: grid;
+    grid-template-columns: minmax(360px, 1fr) minmax(360px, 1fr);
+    gap: 1px;
+    background: var(--hairline);
+  }
+  @media (max-width: 900px) {
+    .corpo { grid-template-columns: 1fr; }
+  }
+
+  .pannello {
+    background: var(--bg-panel);
+    padding: 1.2rem 1.4rem 1.4rem;
+    position: relative;
+  }
+
+  .intestazione-pannello {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 0.9rem;
+  }
+
+  .titolo-pannello {
+    font-family: var(--mono);
+    font-size: 0.75rem;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--testo-primario);
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+  .titolo-pannello::before {
+    content: "";
+    width: 6px; height: 6px;
+    background: var(--segnale);
+    display: inline-block;
+  }
+
+  /* ---- vite decorativa agli angoli, richiamo hardware ---- */
+  .pannello::before, .pannello::after {
+    content: "";
+    position: absolute;
+    top: 10px;
+    width: 4px; height: 4px;
+    border-radius: 50%;
+    background: var(--hairline-forte);
+  }
+  .pannello::before { left: 10px; }
+  .pannello::after { right: 10px; }
+
+  /* ================= CONTROLLI STILE (barra strumenti) ================= */
+  .barra-strumenti {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.6rem;
+    background: var(--bg-field);
+    border: 1px solid var(--hairline);
+    border-radius: 8px;
+    margin-bottom: 0.9rem;
+  }
+
+  .gruppo-controllo {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+  }
+  .separatore-verticale {
+    width: 1px;
+    align-self: stretch;
+    background: var(--hairline-forte);
+    margin: 0 0.15rem;
+  }
+
+  select, input[type="text"], input[type="number"], button {
+    font-family: var(--sans);
+    font-size: 0.85rem;
+    color: var(--testo-primario);
+    background: var(--bg-panel-alt);
+    border: 1px solid var(--hairline-forte);
+    border-radius: 6px;
+    padding: 0.4rem 0.65rem;
+    cursor: pointer;
+    transition: border-color 0.15s ease, background 0.15s ease, color 0.15s ease;
+  }
+  select:hover, input:hover, button:hover {
+    border-color: var(--segnale);
+  }
+  select:focus, input:focus, button:focus {
+    outline: none;
+    border-color: var(--segnale);
+    box-shadow: 0 0 0 2px var(--segnale-scuro);
+  }
+
+  button { font-family: var(--mono); font-size: 0.72rem; letter-spacing: 0.03em; }
+  button:active { transform: translateY(1px); }
+  button:disabled { opacity: 0.35; cursor: not-allowed; }
+  button:disabled:hover { border-color: var(--hairline-forte); }
+
+  .btn-segnale.attivo {
+    background: var(--segnale);
+    border-color: var(--segnale);
+    color: #04201b;
+    font-weight: 700;
+  }
+
+  .btn-pericolo:hover {
+    border-color: var(--tally-rosso);
+    color: var(--tally-rosso);
+  }
+
+  #dimensione-valore { width: 48px; text-align: center; }
+
+  .wrapper-dimensione { position: relative; }
+  .menu-dimensioni {
+    position: absolute;
+    top: calc(100% + 6px);
+    left: 0;
+    min-width: 60px;
+    max-height: 240px;
+    overflow-y: auto;
+    background: var(--bg-panel-alt);
+    border: 1px solid var(--hairline-forte);
+    border-radius: 8px;
+    box-shadow: 0 10px 24px #000a;
+    z-index: 20;
+    padding: 4px;
+  }
+  .menu-dimensioni.nascosto { display: none; }
+  .opzione-dimensione {
+    display: block;
+    width: 100%;
+    text-align: center;
+    background: transparent;
+    border: none;
+    border-radius: 4px;
+    font-family: var(--mono);
+    padding: 6px 0;
+  }
+  .opzione-dimensione:hover { background: var(--segnale-scuro); color: var(--segnale); border-color: transparent; }
+
+  input[type="color"] {
+    width: 38px; height: 32px;
+    padding: 2px;
+  }
+
+  /* ================= EDITOR ================= */
+  #editor-testo {
+    display: block;
+    min-height: 3.4rem;
+    background: var(--bg-field);
+    border: 1px solid var(--hairline);
+    border-radius: 8px;
+    padding: 1rem 1.6rem;
+    outline: none;
+    font-size: 2rem;
+    line-height: 1.3;
+    white-space: pre-wrap;
+    word-break: break-word;
+  }
+  #editor-testo:focus { border-color: var(--segnale); }
+
+  .riga-stato-editor {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-top: 0.6rem;
+    gap: 1rem;
+  }
+
+  .misuratore-capacita {
+    flex: 1;
+    display: flex;
+    gap: 3px;
+    height: 8px;
+  }
+  .segmento-misuratore {
+    flex: 1;
+    background: var(--bg-field);
+    border: 1px solid var(--hairline);
+    border-radius: 2px;
+    transition: background 0.15s ease, border-color 0.15s ease;
+  }
+  .segmento-misuratore.pieno-ok { background: var(--segnale); border-color: var(--segnale); }
+  .segmento-misuratore.pieno-alto { background: var(--tally-ambra); border-color: var(--tally-ambra); }
+
+  #indicatore-righe {
+    font-family: var(--mono);
+    font-size: 0.7rem;
+    color: var(--testo-muto);
+    white-space: nowrap;
+  }
+
+  .cluster-righe-max {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-top: 0.8rem;
+  }
+  #campo-righe-max { width: 55px; }
+
+  /* ================= USCITA / ANTEPRIMA LEDWALL ================= */
+  .monitor-uscita {
+    position: relative;
+    border: 1px solid var(--hairline);
+    border-radius: 10px;
+    background: #050505;
+    padding: 10px;
+  }
+
+  .cornice-monitor-etichetta {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    margin-bottom: 8px;
+  }
+
+  .tally-onair {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    font-family: var(--mono);
+    font-size: 0.68rem;
+    letter-spacing: 0.1em;
+    color: var(--testo-flebile);
+  }
+  .tally-onair .puntino-onair {
+    width: 9px; height: 9px; border-radius: 50%;
+    background: var(--tally-rosso-scuro);
+    transition: background 0.2s ease, box-shadow 0.2s ease;
+  }
+  .tally-onair.attivo .puntino-onair {
+    background: var(--tally-rosso);
+    box-shadow: 0 0 10px var(--tally-rosso);
+    animation: pulsa-tally 1.6s ease-in-out infinite;
+  }
+  .tally-onair.attivo { color: var(--tally-rosso); }
+  @keyframes pulsa-tally {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.55; }
+  }
+
+  #riquadro-uscita {
+    width: 100%;
+    background: var(--chroma);
+    border: 2px solid var(--chroma-bordo);
+    border-radius: 4px;
+    min-height: calc(2.6rem * 1.3 * 2 + 32px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 16px;
+    overflow: hidden;
+  }
+
+  #testo-uscita {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    gap: 0.15em;
+  }
+
+  .riga-uscita {
+    white-space: nowrap;
+    text-align: center;
+    color: #fff;
+    font-weight: bold;
+    font-size: 2rem;
+    line-height: 1.3;
+  }
+
+  .azioni-uscita {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-top: 0.9rem;
+  }
+
+  /* ================= REGISTRO / MEMORIA ================= */
+  .pannello-registro {
+    grid-column: 1 / -1;
+    background: var(--bg-panel);
+    padding: 1.2rem 1.4rem 1.4rem;
+    position: relative;
+  }
+
+  .barra-registro {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 0.6rem;
+    margin-bottom: 0.9rem;
+  }
+
+  #lista-registro {
+    max-height: 260px;
+    overflow-y: auto;
+    border: 1px solid var(--hairline);
+    border-radius: 8px;
+    background: var(--bg-field);
+  }
+
+  .voce-registro {
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+    padding: 0.55rem 0.9rem;
+    border-bottom: 1px solid var(--hairline);
+  }
+  .voce-registro:last-child { border-bottom: none; }
+  .voce-registro:nth-child(odd) { background: #ffffff03; }
+
+  .indice-voce {
+    font-family: var(--mono);
+    font-size: 0.7rem;
+    color: var(--testo-flebile);
+    min-width: 2.2rem;
+    text-align: right;
+  }
+
+  .testo-voce {
+    flex: 1;
+    font-size: 1.35rem;
+    line-height: 1.3;
+    word-break: break-word;
+  }
+
+  .btn-copia-voce {
+    font-family: var(--mono);
+    font-size: 0.68rem;
+    padding: 0.35rem 0.6rem;
+    white-space: nowrap;
+  }
+  .btn-copia-voce.copiato {
+    background: var(--tally-verde);
+    border-color: var(--tally-verde);
+    color: #04250f;
+  }
+
+  .registro-vuoto {
+    padding: 1.4rem;
+    text-align: center;
+    color: var(--testo-flebile);
+    font-family: var(--mono);
+    font-size: 0.75rem;
+    letter-spacing: 0.08em;
+  }
+</style>
 </head>
 <body>
 
-  <!-- Barra controlli -->
-  <div id="barra-controlli">
-    <label>Font:</label>
-    <select id="font-selezionato">
-      <option value="Segoe UI, Tahoma, Geneva, Verdana, sans-serif">Segoe UI</option>
-      <option value="Arial, sans-serif" selected>Arial</option>
-      <option value="'Roboto', sans-serif">Roboto</option>
-      <option value="'Times New Roman', serif">Times New Roman</option>
-      <option value="'Courier New', monospace">Courier New</option>
-    </select>
-
-    <button id="grassetto-toggle">G</button>
-
-    <label>Dimensione:</label>
-    <div id="controllo-dimensione">
-      <button id="font-minus" type="button" aria-label="Diminuisci dimensione">−</button>
-      <div id="dimensione-wrapper">
-        <input id="dimensione-font" type="text" value="28" inputmode="numeric" autocomplete="off">
-        <div id="menu-dimensioni" class="nascosto">
-          <button type="button" class="opzione-dimensione">8</button>
-          <button type="button" class="opzione-dimensione">9</button>
-          <button type="button" class="opzione-dimensione">10</button>
-          <button type="button" class="opzione-dimensione">11</button>
-          <button type="button" class="opzione-dimensione">12</button>
-          <button type="button" class="opzione-dimensione">14</button>
-          <button type="button" class="opzione-dimensione">18</button>
-          <button type="button" class="opzione-dimensione">24</button>
-          <button type="button" class="opzione-dimensione">30</button>
-          <button type="button" class="opzione-dimensione">36</button>
-          <button type="button" class="opzione-dimensione">48</button>
-          <button type="button" class="opzione-dimensione">60</button>
-          <button type="button" class="opzione-dimensione">72</button>
-          <button type="button" class="opzione-dimensione">96</button>
-        </div>
+  <!-- ================= TESTATA ================= -->
+  <div class="testata">
+    <div class="testata-sinistra">
+      <div class="marchio">
+        <span class="marchio-sigla">TRADUZIONE</span>
       </div>
-      <button id="font-plus" type="button" aria-label="Aumenta dimensione">+</button>
     </div>
+    <div class="spia-connessione">
+      <span id="puntino-connessione" class="puntino"></span>
+      <span id="testo-connessione">USCITA NON RILEVATA</span>
+    </div>
+  </div>
 
-    <label>Colore:</label>
-    <input type="color" id="colore-font" value="#ffffff">
+  <!-- ================= CORPO: EDITOR + USCITA ================= -->
+  <div class="corpo">
 
-    <button id="scarica-button">Scarica 📥</button>
+    <!-- PANNELLO EDITOR -->
+    <div class="pannello">
+      <div class="intestazione-pannello">
+        <span class="titolo-pannello">Editor</span>
+      </div>
+
+      <div class="barra-strumenti">
+        <div class="gruppo-controllo">
+          <span class="etichetta-tecnica">Font</span>
+          <select id="selettore-font">
+            <option value="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" selected>Sistema</option>
+            <option value="Arial, sans-serif">Arial</option>
+            <option value="'Times New Roman', serif">Times New Roman</option>
+            <option value="'Courier New', monospace">Courier New</option>
+            <option value="Georgia, serif">Georgia</option>
+          </select>
+        </div>
+
+        <div class="separatore-verticale"></div>
+
+        <button id="interruttore-grassetto" class="btn-segnale" title="Grassetto">B</button>
+
+        <div class="separatore-verticale"></div>
+
+        <div class="gruppo-controllo">
+          <span class="etichetta-tecnica">Corpo</span>
+          <button id="dimensione-meno" type="button" aria-label="Diminuisci">−</button>
+          <div class="wrapper-dimensione">
+            <input id="dimensione-valore" type="text" value="28" inputmode="numeric" autocomplete="off">
+            <div id="menu-dimensioni" class="menu-dimensioni nascosto">
+              <button type="button" class="opzione-dimensione">8</button>
+              <button type="button" class="opzione-dimensione">9</button>
+              <button type="button" class="opzione-dimensione">10</button>
+              <button type="button" class="opzione-dimensione">11</button>
+              <button type="button" class="opzione-dimensione">12</button>
+              <button type="button" class="opzione-dimensione">14</button>
+              <button type="button" class="opzione-dimensione">18</button>
+              <button type="button" class="opzione-dimensione">24</button>
+              <button type="button" class="opzione-dimensione">30</button>
+              <button type="button" class="opzione-dimensione">36</button>
+              <button type="button" class="opzione-dimensione">48</button>
+              <button type="button" class="opzione-dimensione">60</button>
+              <button type="button" class="opzione-dimensione">72</button>
+              <button type="button" class="opzione-dimensione">96</button>
+            </div>
+          </div>
+          <button id="dimensione-piu" type="button" aria-label="Aumenta">+</button>
+        </div>
+
+        <div class="separatore-verticale"></div>
+
+        <div class="gruppo-controllo">
+          <span class="etichetta-tecnica">Colore</span>
+          <input type="color" id="selettore-colore" value="#ffffff">
+        </div>
+
+        <div class="separatore-verticale"></div>
+
+        <button id="pulsante-annulla" disabled title="Annulla (Ctrl+Z)">↺ ANNULLA</button>
 
 <!--
-<label>Lingua:</label>
-<select id="lingua-dettatura">
-  <option value="it-IT" selected>Italiano</option>
-  <option value="en-US">English (US)</option>
-  <option value="en-GB">English (UK)</option>
-  <option value="es-ES">Español</option>
-  <option value="fr-FR">Français</option>
-  <option value="de-DE">Deutsch</option>
-</select>
-
-<button id="dettatura-button">🎤</button>
+<div class="separatore-verticale"></div>
+<div class="gruppo-controllo">
+  <span class="etichetta-tecnica">Lingua</span>
+  <select id="selettore-lingua-dettatura">
+    <option value="it-IT" selected>Italiano</option>
+    <option value="en-US">English (US)</option>
+    <option value="en-GB">English (UK)</option>
+    <option value="es-ES">Español</option>
+    <option value="fr-FR">Français</option>
+    <option value="de-DE">Deutsch</option>
+  </select>
+</div>
+<button id="pulsante-dettatura" title="Dettatura vocale">● DETTA</button>
 -->
+      </div>
+
+      <div id="editor-testo" contenteditable="true" spellcheck="false"></div>
+
+      <div class="riga-stato-editor">
+        <div id="misuratore-capacita" class="misuratore-capacita"></div>
+        <span id="indicatore-righe" class="etichetta-tecnica">RIGA 0 / 2</span>
+      </div>
+
+      <div class="cluster-righe-max">
+        <span class="etichetta-tecnica">Limite righe editor</span>
+        <input type="number" id="campo-righe-max" min="1" max="20" value="2">
+      </div>
+    </div>
+
+    <!-- PANNELLO USCITA -->
+    <div class="pannello">
+      <div class="intestazione-pannello">
+        <span class="titolo-pannello">Anteprima</span>
+      </div>
+
+      <div class="monitor-uscita">
+        <div class="cornice-monitor-etichetta">
+          <span id="tally-onair" class="tally-onair">
+            <span class="puntino-onair"></span> ON AIR
+          </span>
+        </div>
+        <div id="riquadro-uscita">
+          <div id="testo-uscita"></div>
+        </div>
+      </div>
+
+      <div class="azioni-uscita">
+        <button id="pulsante-pulisci-schermo">⌀ PULISCI SCHERMO</button>
+        <button id="pulsante-apri-uscita">↗ APRI FINESTRA USCITA</button>
+      </div>
+    </div>
   </div>
 
-  <!-- BLOCCO MEMORIA -->
-  <div id="etichetta"> MEMORIA </div>
-  <div id="blocco-memoria">
-    <div id="memoria-contenuto"></div>
+  <!-- ================= REGISTRO ================= -->
+  <div class="pannello-registro">
+    <div class="barra-registro">
+      <span class="titolo-pannello">Cronologia</span>
+      <div class="gruppo-controllo">
+        <button id="pulsante-copia-tutto">⧉ COPIA TUTTO</button>
+        <button id="pulsante-scarica">⭳ SCARICA .TXT</button>
+        <button id="pulsante-pulisci-registro" class="btn-pericolo">✕ PULISCI CRONOLOGIA</button>
+      </div>
+    </div>
+    <div id="lista-registro"></div>
   </div>
 
-  <!-- Editor -->
-  <div id="etichetta1"> EDITOR TESTO</div>
-  <div id="contenitore-testo">
-    <div id="testo-input" contenteditable="true" spellcheck="false"></div>
-  </div>
+<script>
+(() => {
+  const editor            = document.getElementById('editor-testo');
+  const selettoreFont      = document.getElementById('selettore-font');
+  const interruttoreGrassetto = document.getElementById('interruttore-grassetto');
+  const dimensioneValore   = document.getElementById('dimensione-valore');
+  const selettoreColore    = document.getElementById('selettore-colore');
+  const pulsanteAnnulla    = document.getElementById('pulsante-annulla');
+  const pulsanteScarica    = document.getElementById('pulsante-scarica');
+  const pulsanteCopiaTutto = document.getElementById('pulsante-copia-tutto');
+  const pulsantePulisciSchermo = document.getElementById('pulsante-pulisci-schermo');
+  const pulsantePulisciRegistro = document.getElementById('pulsante-pulisci-registro');
+  const pulsanteApriUscita = document.getElementById('pulsante-apri-uscita');
+  const puntinoConnessione = document.getElementById('puntino-connessione');
+  const testoConnessione   = document.getElementById('testo-connessione');
 
-  <!-- Viewer verde -->
-  <div id="riquadro-verde">
-    <div id="contenuto-verde"></div>
-  </div>
+  const dimensioneMeno = document.getElementById('dimensione-meno');
+  const dimensionePiu  = document.getElementById('dimensione-piu');
+  const menuDimensioni = document.getElementById('menu-dimensioni');
+  const opzioniDimensione = document.querySelectorAll('.opzione-dimensione');
 
-  <!-- Righe editor -->
-  <div id="controller-righe">
-    <label>Righe editor:</label>
-    <input type="number" id="righe-editor" min="1" max="20" value="2">
-  </div>
+  const riquadroUscita = document.getElementById('testo-uscita');
+  const tallyOnair     = document.getElementById('tally-onair');
+  const campoRigheMax  = document.getElementById('campo-righe-max');
 
-  <script src="script.js"></script>
+  const listaRegistro  = document.getElementById('lista-registro');
+  const misuratoreCapacita = document.getElementById('misuratore-capacita');
+  const indicatoreRighe = document.getElementById('indicatore-righe');
+
+  // DETTATURA DISABILITATA TEMPORANEAMENTE — pronta per essere riattivata
+/*
+  const pulsanteDettatura = document.getElementById('pulsante-dettatura');
+  const selettoreLinguaDettatura = document.getElementById('selettore-lingua-dettatura');
+*/
+
+  let storicoUndo = [];
+  let indiceUndo  = -1;
+  let inUndo      = false;
+
+  let registroLog = [];       // una voce per riga visiva, ognuna copiabile singolarmente
+  let ultimoTestoValido = "";
+
+  let riconoscimento  = null;
+  let dettaturaAttiva = false;
+
+  const N_SEGMENTI_MISURATORE = 10;
+
+  /* ---------------- CHIAVI SALVATAGGIO LOCALE (anti-crash) ---------------- */
+  const CHIAVE_REGISTRO      = 'consolletx_registro_v1';
+  const CHIAVE_IMPOSTAZIONI  = 'consolletx_impostazioni_v1';
+  const CHIAVE_BOZZA         = 'consolletx_bozza_v1';
+  const CHIAVE_STATO_USCITA  = 'consolletx_stato_uscita_v1';
+
+  /* ---------------- CANALI VERSO LA FINESTRA DI USCITA (ridondanti) ---------------- */
+  let canaleLive = null;
+  try { canaleLive = new BroadcastChannel('consolletx-uscita'); } catch (e) { canaleLive = null; }
+  let finestraUscita = null;
+  let ultimoPing = 0;
+
+
+  /* ---------------- UTILITY EDITOR ---------------- */
+
+  function portaCaretAllaFine() {
+    const range = document.createRange();
+    const sel = window.getSelection();
+    range.selectNodeContents(editor);
+    range.collapse(false);
+    sel.removeAllRanges();
+    sel.addRange(range);
+  }
+
+  function aggiornaUltimoTestoValido() { ultimoTestoValido = editor.innerText; }
+
+  function limiteRighe() {
+    const n = parseInt(campoRigheMax.value, 10);
+    return Number.isNaN(n) || n < 1 ? 1 : n;
+  }
+
+  function righeLogiche() {
+    const t = editor.innerText;
+    return t ? t.split("\n").length : 1;
+  }
+
+  function righeVisiveConteggio() {
+    const st = getComputedStyle(editor);
+    let lh = parseFloat(st.lineHeight);
+    if (isNaN(lh)) lh = (parseFloat(st.fontSize) || 16) * 1.3;
+
+    // scrollHeight include anche il padding interno della casella: va tolto,
+    // altrimenti il padding viene scambiato per una riga di testo in più
+    const paddingTop = parseFloat(st.paddingTop) || 0;
+    const paddingBottom = parseFloat(st.paddingBottom) || 0;
+    const altezzaSoloTesto = editor.scrollHeight - paddingTop - paddingBottom;
+
+    return Math.round(altezzaSoloTesto / lh) || 1;
+  }
+
+  function righeTotali() { return Math.max(righeLogiche(), righeVisiveConteggio()); }
+
+  // Legge le righe COME APPAIONO VISIVAMENTE (a capo manuale o automatico).
+  // Misura per PAROLA intera (mai carattere per carattere): una parola non
+  // viene mai spezzata a metà tra due righe.
+  function estraiRigheVisive(elemento) {
+    const caratteri = [];
+    const walker = document.createTreeWalker(elemento, NodeFilter.SHOW_TEXT, null);
+    let nodo;
+    while ((nodo = walker.nextNode())) {
+      const testo = nodo.textContent;
+      for (let i = 0; i < testo.length; i++) caratteri.push({ nodo, offset: i });
+    }
+    if (caratteri.length === 0) return [""];
+
+    const rangeCompleto = document.createRange();
+    rangeCompleto.selectNodeContents(elemento);
+    const righeRect = Array.from(rangeCompleto.getClientRects())
+      .filter(r => r.width > 0 || r.height > 0)
+      .sort((a, b) => a.top - b.top);
+
+    if (righeRect.length <= 1) return [elemento.innerText];
+
+    // Soglie nette: il punto di mezzo esatto tra la fine di una riga e l'inizio
+    // della successiva. Una parola va a sinistra o a destra della soglia in modo
+    // inequivocabile — niente più ambiguità di arrotondamento sui bordi delle righe.
+    const confini = [];
+    for (let i = 0; i < righeRect.length - 1; i++) {
+      confini.push((righeRect[i].bottom + righeRect[i + 1].top) / 2);
+    }
+
+    function rigaDiCentro(centro) {
+      for (let i = 0; i < confini.length; i++) {
+        if (centro < confini[i]) return i;
+      }
+      return righeRect.length - 1;
+    }
+
+    const testoCompleto = elemento.innerText;
+    const token = testoCompleto.split(/(\s+)/).filter(t => t.length > 0);
+
+    const righe = righeRect.map(() => "");
+    let cursore = 0;
+    token.forEach(tok => {
+      const inizio = caratteri[cursore];
+      const fine   = caratteri[cursore + tok.length - 1];
+      cursore += tok.length;
+      if (!inizio || !fine) return;
+      const range = document.createRange();
+      range.setStart(inizio.nodo, inizio.offset);
+      range.setEnd(fine.nodo, fine.offset + 1);
+      const rect = range.getBoundingClientRect();
+      const centro = rect.top + rect.height / 2;
+      righe[rigaDiCentro(centro)] += tok;
+    });
+    return righe;
+  }
+
+  let ultimeRighe = [];  // ultime righe mostrate in uscita (per ri-renderizzare su cambio stile o resize)
+
+  // Restituisce lo stile corrente dell'editor, da applicare alle righe in uscita
+  function opzioniStileCorrente() {
+    const st = getComputedStyle(editor);
+    return {
+      fontFamily: st.fontFamily,
+      color: st.color,
+      fontWeight: st.fontWeight,
+      lineHeight: st.lineHeight,
+      dimensioneMassima: parseFloat(st.fontSize) || 28
+    };
+  }
+
+  // Riduce la dimensione del font di UNA riga finché non ci sta, tutta intera,
+  // nella larghezza disponibile — non va mai a capo da sola e non esce dal bordo.
+  // Ricerca binaria: poche iterazioni, nessun blocco percepibile.
+  function adattaRigaALarghezza(elemento, larghezzaDisponibile, dimensioneMassima) {
+    const dimensioneMinima = 10;
+    elemento.style.fontSize = dimensioneMassima + 'px';
+    if (elemento.scrollWidth <= larghezzaDisponibile) return dimensioneMassima;
+
+    let min = dimensioneMinima, max = dimensioneMassima, migliore = dimensioneMinima;
+    for (let i = 0; i < 10 && min <= max; i++) {
+      const meta = Math.floor((min + max) / 2);
+      elemento.style.fontSize = meta + 'px';
+      if (elemento.scrollWidth <= larghezzaDisponibile) { migliore = meta; min = meta + 1; }
+      else { max = meta - 1; }
+    }
+    elemento.style.fontSize = migliore + 'px';
+    return migliore;
+  }
+
+  // Disegna ogni riga come blocco indipendente, ciascuna ridotta quanto basta
+  // per starci intera — mai spezzata in un punto diverso da quello scelto
+  // dall'operatore, su qualunque risoluzione/larghezza dello schermo.
+  function renderRigheAdattate(contenitore, righe, opzioni) {
+    contenitore.innerHTML = "";
+    const righeValide = righe.filter(r => r.trim().length > 0);
+    if (righeValide.length === 0) return;
+
+    const larghezzaDisponibile = contenitore.clientWidth * 0.94;
+
+    righeValide.forEach(testoRiga => {
+      const riga = document.createElement('div');
+      riga.className = 'riga-uscita';
+      riga.style.fontFamily = opzioni.fontFamily;
+      riga.style.color = opzioni.color;
+      riga.style.fontWeight = opzioni.fontWeight;
+      riga.style.lineHeight = opzioni.lineHeight;
+      riga.textContent = testoRiga;
+      contenitore.appendChild(riga);
+      adattaRigaALarghezza(riga, larghezzaDisponibile, opzioni.dimensioneMassima);
+    });
+  }
+
+  function applicaDimensione(valore) {
+    let n = parseInt(valore, 10);
+    if (Number.isNaN(n)) n = parseInt(dimensioneValore.value, 10);
+    if (Number.isNaN(n)) n = 28;
+    if (n < 8) n = 8;
+    if (n > 200) n = 200;
+    dimensioneValore.value = n;
+    editor.style.fontSize = n + "px";
+    ritrasmettiStatoCorrente();
+    salvaImpostazioni();
+    aggiornaMisuratore();
+  }
+
+  function apriMenuDimensioni() { menuDimensioni.classList.remove('nascosto'); }
+  function chiudiMenuDimensioni() { menuDimensioni.classList.add('nascosto'); }
+
+
+  /* ---------------- MISURATORE CAPACITÀ (stile VU-meter) ---------------- */
+
+  function costruisciMisuratore() {
+    misuratoreCapacita.innerHTML = "";
+    for (let i = 0; i < N_SEGMENTI_MISURATORE; i++) {
+      const seg = document.createElement('div');
+      seg.classList.add('segmento-misuratore');
+      misuratoreCapacita.appendChild(seg);
+    }
+  }
+
+  function aggiornaMisuratore() {
+    const limite = limiteRighe();
+    const attuali = righeTotali();
+    const rapporto = Math.min(attuali / limite, 1);
+    const segmentiAccesi = Math.round(rapporto * N_SEGMENTI_MISURATORE);
+    const segmenti = misuratoreCapacita.querySelectorAll('.segmento-misuratore');
+
+    segmenti.forEach((seg, idx) => {
+      seg.classList.remove('pieno-ok', 'pieno-alto');
+      if (idx < segmentiAccesi) {
+        seg.classList.add(rapporto >= 0.8 ? 'pieno-alto' : 'pieno-ok');
+      }
+    });
+
+    indicatoreRighe.textContent = `RIGA ${Math.min(attuali, limite)} / ${limite}`;
+  }
+
+
+  /* ---------------- SINCRONIZZAZIONE LIVE (3 canali ridondanti) ---------------- */
+
+  function statoCorrente(righe) {
+    const opzioni = opzioniStileCorrente();
+    return {
+      righe,
+      fontFamily: opzioni.fontFamily,
+      fontSizeMax: opzioni.dimensioneMassima,
+      color: opzioni.color,
+      fontWeight: opzioni.fontWeight,
+      lineHeight: opzioni.lineHeight,
+      timestamp: Date.now()
+    };
+  }
+
+  function trasmettiStato(righe) {
+    const stato = statoCorrente(righe);
+    try { localStorage.setItem(CHIAVE_STATO_USCITA, JSON.stringify(stato)); } catch (e) {}
+    if (canaleLive) { try { canaleLive.postMessage({ tipo: 'stato', stato }); } catch (e) {} }
+    if (finestraUscita && !finestraUscita.closed) {
+      try { finestraUscita.postMessage({ tipo: 'stato', stato }, '*'); } catch (e) {}
+    }
+  }
+
+  function aggiornaUscita(righe) {
+    ultimeRighe = righe;
+    const opzioni = opzioniStileCorrente();
+    renderRigheAdattate(riquadroUscita, righe, opzioni);
+    tallyOnair.classList.toggle('attivo', righe.some(r => r.trim().length > 0));
+    trasmettiStato(righe);
+  }
+
+  // ri-disegna e ritrasmette le righe correnti (usato dopo un cambio di stile
+  // o dopo un ridimensionamento della finestra)
+  function ritrasmettiStatoCorrente() { aggiornaUscita(ultimeRighe); }
+
+  // ridisegna al ridimensionamento della finestra, per adattare le righe alla nuova larghezza
+  let timerResize = null;
+  window.addEventListener('resize', () => {
+    clearTimeout(timerResize);
+    timerResize = setTimeout(ritrasmettiStatoCorrente, 150);
+  });
+
+  if (canaleLive) {
+    canaleLive.onmessage = (ev) => {
+      if (ev.data && ev.data.tipo === 'ping') {
+        ultimoPing = Date.now();
+        trasmettiStato(ultimeRighe);
+      }
+    };
+  }
+
+  window.addEventListener('message', (ev) => {
+    if (ev.data && ev.data.tipo === 'ping') {
+      ultimoPing = Date.now();
+      trasmettiStato(ultimeRighe);
+    }
+  });
+
+  setInterval(() => {
+    const connesso = (Date.now() - ultimoPing) < 4000;
+    puntinoConnessione.classList.toggle('attivo', connesso);
+    testoConnessione.textContent = connesso ? 'USCITA COLLEGATA' : 'USCITA NON RILEVATA';
+  }, 1000);
+
+  pulsanteApriUscita.addEventListener('click', () => {
+    finestraUscita = window.open('uscita.html', 'consolletx-uscita', 'width=1280,height=260');
+    setTimeout(() => trasmettiStato(ultimeRighe), 300);
+    setTimeout(() => trasmettiStato(ultimeRighe), 1000);
+    setTimeout(() => trasmettiStato(ultimeRighe), 2000);
+  });
+
+
+  /* ---------------- SALVATAGGIO LOCALE (anti-crash / anti-refresh) ---------------- */
+
+  function salvaRegistro() {
+    try { localStorage.setItem(CHIAVE_REGISTRO, JSON.stringify(registroLog)); } catch (e) {}
+  }
+
+  function caricaRegistro() {
+    try {
+      const raw = localStorage.getItem(CHIAVE_REGISTRO);
+      if (!raw) return;
+      const arr = JSON.parse(raw);
+      if (Array.isArray(arr)) { registroLog = arr; renderRegistro(); }
+    } catch (e) {}
+  }
+
+  function salvaImpostazioni() {
+    try {
+      localStorage.setItem(CHIAVE_IMPOSTAZIONI, JSON.stringify({
+        fontFamily: selettoreFont.value,
+        dimensione: dimensioneValore.value,
+        colore: selettoreColore.value,
+        grassetto: interruttoreGrassetto.classList.contains('attivo'),
+        righeMax: campoRigheMax.value
+      }));
+    } catch (e) {}
+  }
+
+  function caricaImpostazioni() {
+    try {
+      const raw = localStorage.getItem(CHIAVE_IMPOSTAZIONI);
+      if (!raw) return false;
+      const imp = JSON.parse(raw);
+
+      if (imp.fontFamily) selettoreFont.value = imp.fontFamily;
+      if (imp.righeMax)   campoRigheMax.value = imp.righeMax;
+      if (imp.colore)     selettoreColore.value = imp.colore;
+
+      editor.style.fontFamily = selettoreFont.value;
+      editor.style.color      = selettoreColore.value;
+
+      const bold = imp.grassetto !== false;
+      interruttoreGrassetto.classList.toggle('attivo', bold);
+      const peso = bold ? "bold" : "normal";
+      editor.style.fontWeight = peso;
+
+      if (imp.dimensione) dimensioneValore.value = imp.dimensione;
+      return true;
+    } catch (e) { return false; }
+  }
+
+  function salvaBozza() {
+    try { localStorage.setItem(CHIAVE_BOZZA, editor.innerText); } catch (e) {}
+  }
+  function caricaBozza() {
+    try {
+      const raw = localStorage.getItem(CHIAVE_BOZZA);
+      if (raw) { editor.innerText = raw; portaCaretAllaFine(); aggiornaUltimoTestoValido(); }
+    } catch (e) {}
+  }
+  function pulisciBozza() {
+    try { localStorage.removeItem(CHIAVE_BOZZA); } catch (e) {}
+  }
+
+
+  /* ---------------- RENDER REGISTRO (una riga visiva = una voce copiabile) ---------------- */
+
+  function renderRegistro() {
+    listaRegistro.innerHTML = "";
+
+    if (registroLog.length === 0) {
+      const vuoto = document.createElement('div');
+      vuoto.classList.add('registro-vuoto');
+      vuoto.textContent = '— nessuna riga trasmessa —';
+      listaRegistro.appendChild(vuoto);
+      salvaRegistro();
+      return;
+    }
+
+    registroLog.forEach((riga, idx) => {
+      const voce = document.createElement('div');
+      voce.classList.add('voce-registro');
+
+      const indice = document.createElement('span');
+      indice.classList.add('indice-voce');
+      indice.textContent = String(idx + 1).padStart(3, '0');
+
+      const testo = document.createElement('span');
+      testo.classList.add('testo-voce');
+      testo.textContent = riga;
+
+      const btn = document.createElement('button');
+      btn.classList.add('btn-copia-voce');
+      btn.textContent = 'COPIA';
+      btn.addEventListener('click', () => {
+        navigator.clipboard.writeText(riga).then(() => {
+          btn.textContent = 'FATTO ✓';
+          btn.classList.add('copiato');
+          setTimeout(() => { btn.textContent = 'COPIA'; btn.classList.remove('copiato'); }, 1200);
+        });
+      });
+
+      voce.appendChild(indice);
+      voce.appendChild(testo);
+      voce.appendChild(btn);
+      listaRegistro.appendChild(voce);
+    });
+
+    listaRegistro.scrollTop = listaRegistro.scrollHeight;
+    salvaRegistro();
+  }
+
+
+  /* ---------------- UNDO ---------------- */
+
+  function aggiungiUndo() {
+    if (inUndo) return;
+    const t = editor.innerHTML;
+    if (storicoUndo.length && storicoUndo[storicoUndo.length - 1] === t) return;
+    storicoUndo.push(t);
+    if (storicoUndo.length > 50) storicoUndo.shift();
+    indiceUndo = storicoUndo.length - 1;
+    pulsanteAnnulla.disabled = indiceUndo <= 0;
+  }
+
+  function annulla() {
+    if (indiceUndo <= 0) return;
+    inUndo = true;
+    indiceUndo--;
+    editor.innerHTML = storicoUndo[indiceUndo];
+    inUndo = false;
+    portaCaretAllaFine();
+    aggiornaUltimoTestoValido();
+    pulsanteAnnulla.disabled = indiceUndo <= 0;
+    ritrasmettiStatoCorrente();
+    aggiornaMisuratore();
+    salvaBozza();
+  }
+
+  pulsanteAnnulla.addEventListener('click', () => { annulla(); editor.focus(); });
+
+
+  /* ---------------- INPUT / TASTIERA ---------------- */
+
+  editor.addEventListener('input', () => {
+    const limite = limiteRighe();
+    const tot = righeTotali();
+    if (tot > limite) {
+      editor.innerText = ultimoTestoValido;
+      portaCaretAllaFine();
+      return;
+    }
+    aggiornaUltimoTestoValido();
+    aggiungiUndo();
+    salvaBozza();
+    aggiornaMisuratore();
+  });
+
+  editor.addEventListener('keydown', e => {
+    ultimoTestoValido = editor.innerText;
+    const limite = limiteRighe();
+
+    if (e.key === 'z' && (e.ctrlKey || e.metaKey)) {
+      e.preventDefault();
+      annulla();
+      return;
+    }
+
+    if (e.key === 'Enter' && e.shiftKey) {
+      e.preventDefault();
+      const backup = editor.innerText;
+      editor.innerText = backup + "\n";
+      const totDopo = righeTotali();
+      editor.innerText = backup;
+      portaCaretAllaFine();
+      if (totDopo > limite) return;
+      document.execCommand('insertLineBreak');
+      return;
+    }
+
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      const testoRaw = editor.innerText;
+      const testo = testoRaw.trim();
+
+      if (testo.length > 0) {
+        const righeVisive = estraiRigheVisive(editor).map(r => r.trim()).filter(r => r.length > 0);
+        righeVisive.forEach(r => registroLog.push(r));
+        renderRegistro();
+        aggiornaUscita(righeVisive);
+      } else {
+        aggiornaUscita([]);
+      }
+
+      editor.innerHTML = "";
+      portaCaretAllaFine();
+      aggiornaUltimoTestoValido();
+      aggiungiUndo();
+      pulisciBozza();
+      aggiornaMisuratore();
+      return;
+    }
+  });
+
+
+  /* ---------------- STILI (font / dimensione / colore / grassetto) ---------------- */
+
+  selettoreFont.addEventListener('change', () => {
+    editor.style.fontFamily = selettoreFont.value;
+    ritrasmettiStatoCorrente();
+    aggiungiUndo();
+    salvaImpostazioni();
+  });
+
+  dimensioneValore.addEventListener('focus', apriMenuDimensioni);
+  dimensioneValore.addEventListener('click', apriMenuDimensioni);
+  dimensioneValore.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') { e.preventDefault(); applicaDimensione(dimensioneValore.value); chiudiMenuDimensioni(); }
+    else if (e.key === 'Escape') { chiudiMenuDimensioni(); }
+  });
+  dimensioneValore.addEventListener('blur', () => {
+    setTimeout(() => { applicaDimensione(dimensioneValore.value); chiudiMenuDimensioni(); }, 120);
+  });
+
+  dimensioneMeno.addEventListener('click', () => applicaDimensione((parseInt(dimensioneValore.value, 10) || 28) - 1));
+  dimensionePiu.addEventListener('click', () => applicaDimensione((parseInt(dimensioneValore.value, 10) || 28) + 1));
+
+  opzioniDimensione.forEach(btn => {
+    btn.addEventListener('mousedown', (e) => {
+      e.preventDefault();
+      applicaDimensione(btn.textContent.trim());
+      chiudiMenuDimensioni();
+    });
+  });
+
+  document.addEventListener('click', (e) => {
+    if (!e.target.closest('.wrapper-dimensione')) chiudiMenuDimensioni();
+  });
+
+  selettoreColore.addEventListener('input', () => {
+    editor.style.color = selettoreColore.value;
+    ritrasmettiStatoCorrente();
+    salvaImpostazioni();
+  });
+
+  interruttoreGrassetto.addEventListener('click', () => {
+    const att = interruttoreGrassetto.classList.toggle('attivo');
+    const peso = att ? 'bold' : 'normal';
+    editor.style.fontWeight = peso;
+    aggiungiUndo();
+    ritrasmettiStatoCorrente();
+    salvaImpostazioni();
+  });
+
+  campoRigheMax.addEventListener('change', () => { salvaImpostazioni(); aggiornaMisuratore(); });
+
+
+  /* ---------------- AZIONI USCITA / REGISTRO ---------------- */
+
+  pulsantePulisciSchermo.addEventListener('click', () => aggiornaUscita([]));
+
+  pulsanteCopiaTutto.addEventListener('click', () => {
+    if (registroLog.length === 0) return;
+    navigator.clipboard.writeText(registroLog.join("\n")).then(() => {
+      pulsanteCopiaTutto.textContent = 'FATTO ✓';
+      setTimeout(() => { pulsanteCopiaTutto.textContent = '⧉ COPIA TUTTO'; }, 1200);
+    });
+  });
+
+  pulsantePulisciRegistro.addEventListener('click', () => {
+    if (registroLog.length === 0) return;
+    const ok = window.confirm(
+      "Vuoi davvero cancellare tutto il registro?\n" +
+      "Questa azione non si può annullare.\n" +
+      "Suggerimento: usa prima \"Scarica .txt\" per salvarne una copia."
+    );
+    if (!ok) return;
+    registroLog = [];
+    renderRegistro();
+  });
+
+  pulsanteScarica.addEventListener('click', () => {
+    const oggi = new Date();
+    const yyyy = oggi.getFullYear();
+    const mm = String(oggi.getMonth() + 1).padStart(2, '0');
+    const dd = String(oggi.getDate()).padStart(2, '0');
+    const nomeFile = `traduzione-${yyyy}-${mm}-${dd}.txt`;
+    const blob = new Blob([registroLog.join("\n")], { type: 'text/plain' });
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = nomeFile;
+    a.click();
+  });
+
+
+  /* ---------------- DETTATURA (disabilitata, pronta per essere riattivata) ---------------- */
+/*
+
+const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+
+if (SpeechRecognition) {
+  riconoscimento = new SpeechRecognition();
+  riconoscimento.continuous = true;
+  riconoscimento.interimResults = false;
+  riconoscimento.lang = selettoreLinguaDettatura.value;
+
+  selettoreLinguaDettatura.addEventListener('change', () => {
+    riconoscimento.lang = selettoreLinguaDettatura.value;
+    if (dettaturaAttiva) { riconoscimento.stop(); setTimeout(() => riconoscimento.start(), 200); }
+  });
+
+  riconoscimento.onresult = event => {
+    const limite = limiteRighe();
+    for (let i = event.resultIndex; i < event.results.length; i++) {
+      const res = event.results[i];
+      if (!res.isFinal) continue;
+      const aggiunta = res[0].transcript + " ";
+      const prima = editor.innerText;
+      editor.innerText = prima + aggiunta;
+      const tot = righeTotali();
+      if (tot > limite) { editor.innerText = prima; portaCaretAllaFine(); continue; }
+      portaCaretAllaFine();
+      aggiornaUltimoTestoValido();
+      aggiungiUndo();
+    }
+  };
+  riconoscimento.onend = () => { if (dettaturaAttiva) riconoscimento.start(); };
+} else {
+  pulsanteDettatura.disabled = true;
+  pulsanteDettatura.title = "Dettatura non supportata.";
+}
+
+pulsanteDettatura.addEventListener('click', () => {
+  if (!riconoscimento) return;
+  dettaturaAttiva = !dettaturaAttiva;
+  pulsanteDettatura.classList.toggle('attivo', dettaturaAttiva);
+  if (dettaturaAttiva) riconoscimento.start();
+  else riconoscimento.stop();
+});
+
+*/
+
+  /* ---------------- INIZIALIZZAZIONE ---------------- */
+
+  costruisciMisuratore();
+
+  const impostazioniTrovate = caricaImpostazioni();
+  if (!impostazioniTrovate) {
+    interruttoreGrassetto.classList.add('attivo');
+    editor.style.fontWeight = 'bold';
+  }
+
+  caricaRegistro();
+  caricaBozza();
+
+  aggiornaUltimoTestoValido();
+  aggiungiUndo();
+  applicaDimensione(dimensioneValore.value);
+  pulsanteAnnulla.disabled = true;
+  aggiornaMisuratore();
+})();
+</script>
 </body>
 </html>
